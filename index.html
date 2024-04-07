@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Barcode Generator</title>
+    <!-- JsBarcode library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.code128.min.js"></script>
+    <style>
+        .entry {
+            border: 1px solid darkgrey;
+            margin-bottom: 500px; /* Adds space between each entry */
+            padding: 10px; /* Adds some padding inside the entry boxes */
+        }
+        .entry:first-child {
+             margin-top: 200px;
+        }
+        .title, .deadline {
+            font-size: 16px;
+            margin: 5px 0; /* Adds margin above and below the text */
+        }
+    </style>
+</head>
+<body>
+    <textarea id="text-input" rows="10" cols="50" placeholder="Format: Title - Code - Deadline"></textarea><br>
+    <button id="generate-barcode">Generate Barcodes</button>
+    <div id="info-text">Codes eingeben, knopf drücken, schön scrollen</div>
+    <div id="barcode-area"></div>
+
+    <script>
+        document.getElementById('generate-barcode').addEventListener('click', function() {
+            const text = document.getElementById('text-input').value;
+            const lines = text.split('\n').filter(line => line.trim() !== ''); // Remove empty lines
+            const barcodeArea = document.getElementById('barcode-area');
+
+            barcodeArea.innerHTML = ''; // Clear previous entries
+
+            lines.forEach(function(line) {
+                const [title, code, deadline] = line.split(' - ').map(part => part.trim());
+                if(code) {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.classList.add('entry');
+
+                    const titleElement = document.createElement('div');
+                    titleElement.classList.add('title');
+                    titleElement.textContent = title;
+                    entryDiv.appendChild(titleElement);
+
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    JsBarcode(svg, code, {format: "CODE128"});
+                    entryDiv.appendChild(svg);
+
+                    const deadlineElement = document.createElement('div');
+                    deadlineElement.classList.add('deadline');
+                    deadlineElement.textContent = deadline;
+                    entryDiv.appendChild(deadlineElement);
+
+                    barcodeArea.appendChild(entryDiv);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
